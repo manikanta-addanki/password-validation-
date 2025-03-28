@@ -1,77 +1,33 @@
-body{
-    background-color: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    font-family: "Poppins", sans-serif;
-}
+import requests
 
-.container{
-    padding: 20px;
-    background-color: #f74;
-    color: white;
-    width: 250px;
-    border-radius: 10px;
-}
+# Replace with your actual API key
+API_KEY = "b2609b3a0e9dfa891748f0d3"
+BASE_URL = f"https://v6.exchangerate-api.com/v6/{API_KEY}/latest/"
 
-div .user{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-h4{
-    color: black;
-}
-
-
-img{
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-}
-.input-box{
-    background-color: rgb(255, 255, 255);
-}
-input{
-    width: 80%;
-    height: 25px;
-    border-radius: 5px;
-    outline: none;
-    border: none;
-    padding: 5px;
-    margin-left: 5px;
-}
-
-div button{
-    background-color: white;
-    width: 80px;
-    height: 30px;
-    border-radius: 30px;
-    outline: none;
-    border: none;
-    color: #f74;
+def get_exchange_rate(base_currency, target_currency):
+    """Fetch exchange rate from API"""
+    url = BASE_URL + base_currency
+    response = requests.get(url)
     
-}
+    if response.status_code != 200:
+        return None
 
-.fa-eye{
-    color: black;
-    cursor: pointer;
-}
-button{
-    cursor: pointer;
-    margin-top: 10px;
-}
-.password{
-    display: none;
-}
+    data = response.json()
+    return data["conversion_rates"].get(target_currency, None)
 
-.valid{
-    color: rgb(202, 248, 184);
-}
+def convert_currency(amount, base_currency, target_currency):
+    """Convert currency using real-time exchange rates"""
+    rate = get_exchange_rate(base_currency, target_currency)
+    if rate is None:
+        print("Invalid currency or API issue.")
+        return None
+    return round(amount * rate, 2)
 
-.valid::before{
-    content: " ✔ ";
-    padding-right: 10px;
-}
+# User Input
+base_currency = input("Enter base currency (e.g., USD): ").upper()
+target_currency = input("Enter target currency (e.g., EUR): ").upper()
+amount = float(input("Enter amount to convert: "))
+
+converted_amount = convert_currency(amount, base_currency, target_currency)
+if converted_amount is not None:
+    print(f"{amount} {base_currency} = {converted_amount} {target_currency}")
